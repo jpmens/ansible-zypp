@@ -1,0 +1,125 @@
+#!/bin/bash
+
+# (c) 2012, Jan-Piet Mens <jpmens@gmail.com>
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+# zypp
+#	pkg= package-name
+#	state= installed|removed (default: installed)
+#
+# !!! Do not, repeat: NOT, pass shell-metacharacters in any of the
+# !!! arguments.
+#
+# example playbook-usage:
+#
+#	  - name: Install editor
+#	    action: zypp pkg=vim state=installed
+#
+# Notes:
+#	zypper on openSUSE 12.1 always exits with 0 -- that's a BUG
+#
+# Follow (tail -f) a node's `/var/log/zypp/history' to see operation.
+#
+# When asked to remove non-existent and thus not-installed package
+# we succeed. Also, when asked to remove a not-installed package
+# we succeed.
+
+set -e
+
+t=$(mktemp /tmp/azypp.XXXXXX)
+
+trap "rm -f $t" 0 1 2 15
+
+function installed() {
+        package="$*"
+
+	# Below works on SLES11SP1 but NOT on openSUSE 12.1 because
+	# the latter exits with 0 if package *not* installed. (sigh)
+        # $zypper \
+	# 	--quiet \
+	# 	--non-interactive search \
+	# 	--installed-only \
+	# 	--match-exact \
+	# 	"${package}" > /dev/null 2>&1
+
+	$rpm --quiet --query "${package}"
+	wasinstalled=$?
+        return $wasinstalled
+}
+
+source ${1}
+
+zypper="/usr/bin/zypper"
+rpm=/bin/rpm
+changed=False
+state=${state:=installed}
+
+if [ -z "${pkg}" ]; then
+	echo 'failed=True msg="Module needs package name in pkg="'
+	exit 0;
+fi
+
+case "${state}" in
+	installed)
+		if installed "${pkg}"; then
+			echo "changed=False"
+			exit 0
+		fi
+
+		( $zypper \
+			--quiet \
+			--non-interactive \
+			install \
+			--auto-agree-with-licenses \
+			"${pkg}" ) > $t 2>&1 
+		if [ $? -ne 0 ]; then
+			res=$(sed -e "s/['\"]//g" $t)
+			echo "failed=True msg=\"zypper install: $?: $res\"" 
+			exit 0
+		fi
+		changed=True
+		;;
+
+	removed)
+		if ! installed "${pkg}"; then
+			echo "changed=False"
+			exit 0
+		fi
+
+		( $zypper \
+			--quiet \
+			--non-interactive \
+			remove \
+			"${pkg}" ) > $t 2>&1
+		if [ $? -ne 0 ]; then
+			res=$(sed -e "s/['\"]//g" $t)
+			echo "failed=True msg=\"zypper remove: $?: $res\"" 
+			exit 0
+		fi
+
+		changed=True
+		;;
+
+	*)
+		echo "failed=True msg=\"Unsupported state=$state\""
+		exit 0
+		;;
+esac
+
+
+echo "changed=${changed}"
+exit 0
