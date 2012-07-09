@@ -4,6 +4,8 @@ First stab at an Ansible module (`bash`, not Python) for installation/removal of
 
 There appears to be some [Python zypper stuff floating around][1], but I have neither the time nor the inclination to use that, particularly not, as it's not installed by default on either platform (chicken/egg).
 
+See also: [Shell scripts as Ansible modules][2]
+
 ## Installation
 
 Copy `zypp` to `$ANSIBLE_LIBRARY` on the management host. (There's no need to make it executable.)
@@ -31,3 +33,4 @@ Do not, *repeat: NOT*, pass shell-metacharacters in any of the arguments.
 
 
   [1]: http://lists.opensuse.org/opensuse-softwaremgmt/2009-05/msg00001.html
+  [2]: http://jpmens.net/2012/07/05/shell-scripts-as-ansible-modules/
