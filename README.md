@@ -30,6 +30,8 @@ Do not, *repeat: NOT*, pass shell-metacharacters in any of the arguments.
 
 * zypper on openSUSE 12.1 always exits with 0 -- that's a BUG
 * Follow (tail -f) a node's `/var/log/zypp/history` to see operation.
+* Works on SLES11
+* 2012-08-31: fix zypper options for SLES10SP3
 
 
   [1]: http://lists.opensuse.org/opensuse-softwaremgmt/2009-05/msg00001.html

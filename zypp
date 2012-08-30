@@ -79,12 +79,20 @@ case "${state}" in
 			echo "changed=False"
 			exit 0
 		fi
+		ZOPTS="--quiet --noninteractive"
+		ZOPTS2="--auto-agree-with-licenses"
+		SLESVERSION=`awk '/VERSION/ { print $3; }' /etc/SuSE-release`
+		case $SLESVERSION in
+			10)
+				ZOPTS=""
+				ZOPTS2="--no-confirm"
+				;;
+		esac
 
 		( $zypper \
-			--quiet \
-			--non-interactive \
+			$ZOPTS \
 			install \
-			--auto-agree-with-licenses \
+			$ZOPTS2 \
 			"${pkg}" ) > $t 2>&1 
 		if [ $? -ne 0 ]; then
 			res=$(sed -e "s/['\"]//g" $t)
@@ -100,10 +108,19 @@ case "${state}" in
 			exit 0
 		fi
 
+		ZOPTS="--quiet --noninteractive"
+		SLESVERSION=`awk '/VERSION/ { print $3; }' /etc/SuSE-release`
+		case $SLESVERSION in
+			10)
+				ZOPTS=""
+				ZOPTS2="--no-confirm"
+				;;
+		esac
+
 		( $zypper \
-			--quiet \
-			--non-interactive \
+			$ZOPTS \
 			remove \
+			$ZOPTS2 \
 			"${pkg}" ) > $t 2>&1
 		if [ $? -ne 0 ]; then
 			res=$(sed -e "s/['\"]//g" $t)
