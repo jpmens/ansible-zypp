@@ -61,7 +61,7 @@ function installed() {
         return $wasinstalled
 }
 
-source ${1}
+eval $(sed -e "s/\s?\([^=]+\)\s?=\s?\(\x22\([^\x22]+\)\x22|\x27\([^\x27]+\)\x27|\(\S+\)\)\s?/\1='\2'/p" $1)
 
 zypper="/usr/bin/zypper"
 rpm=/bin/rpm
