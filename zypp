@@ -79,7 +79,7 @@ case "${state}" in
 			echo "changed=False"
 			exit 0
 		fi
-		ZOPTS="--quiet --noninteractive"
+		ZOPTS="--quiet --non-interactive"
 		ZOPTS2="--auto-agree-with-licenses"
 		SLESVERSION=`awk '/VERSION/ { print $3; }' /etc/SuSE-release`
 		case $SLESVERSION in
@@ -108,7 +108,7 @@ case "${state}" in
 			exit 0
 		fi
 
-		ZOPTS="--quiet --noninteractive"
+		ZOPTS="--quiet --non-interactive"
 		SLESVERSION=`awk '/VERSION/ { print $3; }' /etc/SuSE-release`
 		case $SLESVERSION in
 			10)
