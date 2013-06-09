@@ -1,5 +1,9 @@
 # zypp
 
+## Warning: deprectated
+
+Ansible 1.2 now ships with a zypper module. Use that.
+
 First stab at an Ansible module (`bash`, not Python) for installation/removal of packages on Suse's SLES and openSUSE.
 
 There appears to be some [Python zypper stuff floating around][1], but I have neither the time nor the inclination to use that, particularly not, as it's not installed by default on either platform (chicken/egg).
